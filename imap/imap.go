@@ -142,7 +142,7 @@ func (c *Client) StartTLS(config *tls.Config) (cmd *Command, err error) {
 //
 // This command is synchronous.
 func (c *Client) Auth(a SASL) (cmd *Command, err error) {
-	info := ServerInfo{c.host, c.t.Encrypted(), c.getCaps("AUTH=")}
+	info := ServerInfo{c.host, c.t.Encrypted(), c.GetCaps("AUTH=")}
 	mech, cr, err := a.Start(&info)
 	if err != nil {
 		return

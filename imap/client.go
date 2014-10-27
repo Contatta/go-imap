@@ -596,7 +596,7 @@ func (c *Client) setCaps(caps []Field) {
 		}
 	}
 	if c.debugLog.mask&LogState != 0 {
-		caps := strings.Join(c.getCaps(""), " ")
+		caps := strings.Join(c.GetCaps(""), " ")
 		if caps == "" {
 			caps = "(none)"
 		}
@@ -604,9 +604,9 @@ func (c *Client) setCaps(caps []Field) {
 	}
 }
 
-// getCaps returns a sorted list of capabilities that share a common prefix. The
+// GetCaps returns a sorted list of capabilities that share a common prefix. The
 // prefix is stripped from the returned strings.
-func (c *Client) getCaps(prefix string) []string {
+func (c *Client) GetCaps(prefix string) []string {
 	caps := make([]string, 0, len(c.Caps))
 	if n := len(prefix); n == 0 {
 		for v := range c.Caps {
