@@ -847,3 +847,15 @@ func TestClientQuota(T *testing.T) {
 	t.join("GETQUOTAROOT", err)
 	t.waitEOF()
 }
+
+func TestSupports(T *testing.T) {
+	C, t := newClient(T, `S: * PREAUTH [CAPABILITY IMAP4rev1 QUOTA] Test server ready`+CRLF)
+
+	if C.Supports("IMAP4rev1") != true {
+		t.Fatal("Supports returned not true for IMAP4rev1")
+	}
+
+	if C.Supports("NOSUCHCAPABILITY") != false {
+		t.Fatal("Supports returned not false for NOSUCHCAPABILITY")
+	}
+}
