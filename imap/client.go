@@ -623,6 +623,17 @@ func (c *Client) GetCaps(prefix string) []string {
 	return caps
 }
 
+// Supports returns boolean if the server supports the given capability
+func (c *Client) Supports(capability string) bool {
+	capability = strings.ToUpper(capability)
+	for v := range c.Caps {
+		if capability == v {
+			return true
+		}
+	}
+	return false
+}
+
 // close closes the connection without sending any additional data or updating
 // client state. After the first invocation this method becomes a no-op.
 func (c *Client) close(reason string) (err error) {
