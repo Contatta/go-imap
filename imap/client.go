@@ -627,7 +627,7 @@ func (c *Client) GetCaps(prefix string) []string {
 func (c *Client) Supports(capability string) bool {
 	capability = strings.ToUpper(capability)
 	for v := range c.Caps {
-		if capability == v {
+		if capability == strings.ToUpper(v) {
 			return true
 		}
 	}
