@@ -21,8 +21,8 @@ const DATETIME = `"_2-Jan-2006 15:04:05 -0700"`
 type Field interface{}
 
 // TypeOf returns the field data type. Valid types are Atom, Number,
-// QuotedString, LiteralString, List, Bytes, and NIL. Zero is returned for
-// unknown data types.
+// Number64 QuotedString, LiteralString, List, Bytes, and NIL. Zero is
+// returned for unknown data types.
 func TypeOf(f Field) FieldType {
 	switch f.(type) {
 	case string:
@@ -67,7 +67,7 @@ func AsNumber(f Field) uint32 {
 // != Number.
 func AsNumber64(f Field) uint64 {
 	v, _ := f.(uint64)
-	return uint64(v)
+	return v
 }
 
 // AsString returns the value of an astring (string or atom) field. Quoted
