@@ -33,6 +33,8 @@ func TypeOf(f Field) FieldType {
 		}
 	case uint32:
 		return Number
+	case uint64:
+		return Number64
 	case []Field:
 		return List
 	case []byte:
@@ -59,6 +61,13 @@ func AsAtom(f Field) string {
 func AsNumber(f Field) uint32 {
 	v, _ := f.(uint32)
 	return v
+}
+
+// AsNumber returns the value of a numeric field. Zero is returned if TypeOf(f)
+// != Number.
+func AsNumber64(f Field) uint64 {
+	v, _ := f.(uint64)
+	return uint64(v)
 }
 
 // AsString returns the value of an astring (string or atom) field. Quoted

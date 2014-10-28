@@ -84,6 +84,7 @@ type FieldType uint8
 const (
 	Atom          = FieldType(1 << iota) // String consisting of non-special ASCII characters
 	Number                               // Unsigned 32-bit integer
+	Number64                             // Unsigned 64-bit integer
 	QuotedString                         // String enclosed in double quotes
 	LiteralString                        // String or binary data
 	List                                 // Parenthesized list
@@ -94,6 +95,7 @@ const (
 var fieldTypes = []enumName{
 	{uint32(Atom), "Atom"},
 	{uint32(Number), "Number"},
+	{uint32(Number64), "Number64"},
 	{uint32(QuotedString), "QuotedString"},
 	{uint32(LiteralString), "LiteralString"},
 	{uint32(List), "List"},

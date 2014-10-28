@@ -116,6 +116,27 @@ func (rsp *Response) Value() uint32 {
 	return v
 }
 
+// Value64 returns the first unsigned 64-bit integer in Fields without descending
+// into parenthesized lists. This decoder is primarily intended for the responses
+// labled HIGHESTMODSEQ. Ref: http://tools.ietf.org/html/rfc4551#page-19
+func (rsp *Response) Value64() uint64 {
+	v, ok := rsp.Decoded.(uint64)
+	if !ok && rsp.Decoded == nil {
+		for _, f := range rsp.Fields {
+			if TypeOf(f) == Number {
+				v = uint64(AsNumber(f))
+				rsp.Decoded = v
+				break
+			} else if TypeOf(f) == Number64 {
+				v = AsNumber64(f)
+				rsp.Decoded = v
+				break
+			}
+		}
+	}
+	return v
+}
+
 // Challenge returns the decoded Base64 data from a continuation request sent
 // during challenge-response authentication.
 func (rsp *Response) Challenge() []byte {
@@ -156,16 +177,17 @@ func (rsp *Response) MailboxInfo() *MailboxInfo {
 // currently selected mailbox. Fields that are only set by the Client are marked
 // as client-only.
 type MailboxStatus struct {
-	Name         string  // Mailbox name
-	ReadOnly     bool    // Mailbox read/write access (client-only)
-	Flags        FlagSet // Defined flags in the mailbox (client-only)
-	PermFlags    FlagSet // Flags that the client can change permanently (client-only)
-	Messages     uint32  // Number of messages in the mailbox
-	Recent       uint32  // Number of messages with the \Recent flag set
-	Unseen       uint32  // Sequence number of the first unseen message
-	UIDNext      uint32  // The next unique identifier value
-	UIDValidity  uint32  // The unique identifier validity value
-	UIDNotSticky bool    // UIDPLUS extension (client-only)
+	Name          string  // Mailbox name
+	ReadOnly      bool    // Mailbox read/write access (client-only)
+	Flags         FlagSet // Defined flags in the mailbox (client-only)
+	PermFlags     FlagSet // Flags that the client can change permanently (client-only)
+	Messages      uint32  // Number of messages in the mailbox
+	Recent        uint32  // Number of messages with the \Recent flag set
+	Unseen        uint32  // Sequence number of the first unseen message
+	UIDNext       uint32  // The next unique identifier value
+	UIDValidity   uint32  // The unique identifier validity value
+	UIDNotSticky  bool    // UIDPLUS extension (client-only)
+	HighestModSeq uint64  // CONDSTORE extension only. The current highest ModSeq
 }
 
 // newMailboxStatus returns an initialized MailboxStatus instance.
@@ -182,17 +204,18 @@ func newMailboxStatus(name string) *MailboxStatus {
 
 func (m *MailboxStatus) String() string {
 	return fmt.Sprintf("--- %+q ---\n"+
-		"ReadOnly:     %v\n"+
-		"Flags:        %v\n"+
-		"PermFlags:    %v\n"+
-		"Messages:     %v\n"+
-		"Recent:       %v\n"+
-		"Unseen:       %v\n"+
-		"UIDNext:      %v\n"+
-		"UIDValidity:  %v\n"+
-		"UIDNotSticky: %v\n",
+		"ReadOnly:      %v\n"+
+		"Flags:         %v\n"+
+		"PermFlags:     %v\n"+
+		"Messages:      %v\n"+
+		"Recent:        %v\n"+
+		"Unseen:        %v\n"+
+		"UIDNext:       %v\n"+
+		"UIDValidity:   %v\n"+
+		"UIDNotSticky:  %v\n"+
+		"HighestModSeq: %v\n",
 		m.Name, m.ReadOnly, m.Flags, m.PermFlags, m.Messages, m.Recent,
-		m.Unseen, m.UIDNext, m.UIDValidity, m.UIDNotSticky)
+		m.Unseen, m.UIDNext, m.UIDValidity, m.UIDNotSticky, m.HighestModSeq)
 }
 
 // MailboxStatus returns the mailbox status information extracted from a STATUS
@@ -214,6 +237,8 @@ func (rsp *Response) MailboxStatus() *MailboxStatus {
 				v.UIDValidity = n
 			case "UNSEEN":
 				v.Unseen = n
+			case "HIGHESTMODSEQ":
+				v.HighestModSeq = AsNumber64(f[i+1])
 			}
 		}
 		rsp.Decoded = v

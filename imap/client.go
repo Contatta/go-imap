@@ -436,6 +436,8 @@ func (c *Client) update(rsp *Response) {
 			return
 		}
 		switch selected := (c.state == Selected); rsp.Label {
+		case "HIGHESTMODSEQ":
+			c.Mailbox.HighestModSeq = rsp.Value64()
 		case "PERMANENTFLAGS":
 			c.Mailbox.PermFlags.Replace(rsp.Fields[1])
 		case "READ-ONLY":
